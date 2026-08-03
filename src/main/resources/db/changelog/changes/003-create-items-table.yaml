@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-items-table
+      author: ma_yak
+      changes:
+        - createTable:
+            tableName: items
+            columns:
+              - column: { name: id, type: uuid, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: price, type: NUMERIC (12,2), constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMPTZ, constraints: { nullable: false } }
+              - column: { name: updated_at, type: TIMESTAMPTZ, constraints: { nullable: false } }
+
+  - changeSet:
+      id: 003-items-price-check
+      author: ma_yak
+      changes:
+        - sql:
+            sql: ALTER TABLE items ADD CONSTRAINT ck_items_price CHECK (price > 0)
+      rollback:
+        - sql:
+            sql: ALTER TABLE items DROP CONSTRAINT ck_items_price

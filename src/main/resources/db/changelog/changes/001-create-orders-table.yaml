@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-orders-table
+      author: ma_yak
+      changes:
+        - createTable:
+            tableName: orders
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: user_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: status, type: VARCHAR (25), constraints: { nullable: false } }
+              - column: { name: total_price, type: NUMERIC (12,2), constraints: { nullable: false} }
+              - column: { name: deleted, type: BOOLEAN, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMPTZ, constraints: { nullable: false } }
+              - column: { name: updated_at, type: TIMESTAMPTZ, constraints: { nullable: false } }
+
+  - changeSet:
+      id: 001-orders-total-price-check
+      author: ma_yak
+      changes:
+        - sql:
+            sql: ALTER TABLE orders ADD CONSTRAINT ck_orders_total_price CHECK (total_price > 0)
+        - sql:
+            sql: ALTER TABLE orders DROP CONSTRAINT ck_orders_total_price
