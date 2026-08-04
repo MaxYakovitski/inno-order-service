@@ -1,11 +1,12 @@
 databaseChangeLog:
   - changeSet:
-      id: 002-create-order-items-table
+      id: 003-create-order-items-table
       author: ma_yak
       changes:
         - createTable:
             tableName: order_items
             columns:
+              - column: { name: version, type: BIGINT, constraints: { nullable: false } }
               - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
               - column: { name: order_id, type: UUID,
                           constraints: { foreignKeyName: fk_order_items_orders,
@@ -33,7 +34,7 @@ databaseChangeLog:
                   name: item_id
 
   - changeSet:
-      id: 002-order-items-quantity-check
+      id: 003-order-items-quantity-check
       author: ma_yak
       changes:
         - sql:

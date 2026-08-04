@@ -1,11 +1,12 @@
 databaseChangeLog:
   - changeSet:
-      id: 003-create-items-table
+      id: 002-create-items-table
       author: ma_yak
       changes:
         - createTable:
             tableName: items
             columns:
+              - column: { name: version, type: BIGINT, constraints: { nullable: false } }
               - column: { name: id, type: uuid, constraints: { primaryKey: true, nullable: false } }
               - column: { name: name, type: VARCHAR(255), constraints: { nullable: false } }
               - column: { name: price, type: NUMERIC (12,2), constraints: { nullable: false } }
@@ -13,7 +14,7 @@ databaseChangeLog:
               - column: { name: updated_at, type: TIMESTAMPTZ, constraints: { nullable: false } }
 
   - changeSet:
-      id: 003-items-price-check
+      id: 002-items-price-check
       author: ma_yak
       changes:
         - sql:
