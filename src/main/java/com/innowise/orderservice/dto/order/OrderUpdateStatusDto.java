@@ -1,4 +1,4 @@
-package com.innowise.orderservice.dto;
+package com.innowise.orderservice.dto.order;
 
 import com.innowise.orderservice.entity.OrderStatus;
 import jakarta.validation.constraints.NotNull;

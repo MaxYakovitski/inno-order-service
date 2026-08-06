@@ -1,8 +1,8 @@
 package com.innowise.orderservice.service;
 
-import com.innowise.orderservice.dto.OrderCreateDto;
-import com.innowise.orderservice.dto.OrderResponseDto;
-import com.innowise.orderservice.dto.OrderUpdateStatusDto;
+import com.innowise.orderservice.dto.order.OrderCreateDto;
+import com.innowise.orderservice.dto.order.OrderResponseDto;
+import com.innowise.orderservice.dto.order.OrderUpdateStatusDto;
 import java.util.UUID;
 
 public interface OrderCommandService {

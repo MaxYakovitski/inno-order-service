@@ -1,6 +1,6 @@
 package com.innowise.orderservice.controller;
 
-import com.innowise.orderservice.dto.OrderResponseDto;
+import com.innowise.orderservice.dto.order.OrderResponseDto;
 import com.innowise.orderservice.entity.OrderStatus;
 import com.innowise.orderservice.filter.OrderFilter;
 import com.innowise.orderservice.service.OrderQueryService;

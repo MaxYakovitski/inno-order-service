@@ -1,8 +1,8 @@
 package com.innowise.orderservice.controller;
 
-import com.innowise.orderservice.dto.OrderCreateDto;
-import com.innowise.orderservice.dto.OrderResponseDto;
-import com.innowise.orderservice.dto.OrderUpdateStatusDto;
+import com.innowise.orderservice.dto.order.OrderCreateDto;
+import com.innowise.orderservice.dto.order.OrderResponseDto;
+import com.innowise.orderservice.dto.order.OrderUpdateStatusDto;
 import com.innowise.orderservice.service.OrderCommandService;
 import jakarta.validation.Valid;
 import java.util.UUID;

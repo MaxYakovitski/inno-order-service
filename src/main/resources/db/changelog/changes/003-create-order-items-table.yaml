@@ -20,7 +20,7 @@ databaseChangeLog:
                                          nullable: false }
               }
               - column: { name: quantity, type: INT, constraints: { nullable: false } }
-              - column: { name: priceAtOrder, type: "NUMERIC(12,2)", constraints: {nullable: false } }
+              - column: { name: price_at_order, type: "NUMERIC(12,2)", constraints: {nullable: false } }
               - column: { name: created_at, type: TIMESTAMPTZ, constraints: { nullable: false } }
               - column: { name: updated_at, type: TIMESTAMPTZ, constraints: { nullable: false } }
         - addUniqueConstraint:

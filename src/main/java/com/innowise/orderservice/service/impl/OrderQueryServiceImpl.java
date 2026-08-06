@@ -1,9 +1,9 @@
 package com.innowise.orderservice.service.impl;
 
-import com.innowise.orderservice.dto.OrderResponseDto;
+import com.innowise.orderservice.assembler.OrderAssembler;
+import com.innowise.orderservice.dto.order.OrderResponseDto;
 import com.innowise.orderservice.exception.ResourceNotFoundException;
 import com.innowise.orderservice.filter.OrderFilter;
-import com.innowise.orderservice.mapper.OrderMapper;
 import com.innowise.orderservice.repository.OrderRepository;
 import com.innowise.orderservice.service.OrderQueryService;
 import com.innowise.orderservice.specification.OrderSpecification;
@@ -21,13 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderQueryServiceImpl implements OrderQueryService {
 
   private final OrderRepository orderRepository;
-  private final OrderMapper orderMapper;
+  private final OrderAssembler orderAssembler;
 
   @Transactional(readOnly = true)
   @Override
   public OrderResponseDto getById(UUID id) {
     var order = orderRepository.findById(id).orElseThrow(() -> ResourceNotFoundException.order(id));
-    return orderMapper.toDto(order);
+    return orderAssembler.assemble(order);
   }
 
   @Transactional(readOnly = true)
@@ -42,7 +42,7 @@ public class OrderQueryServiceImpl implements OrderQueryService {
             OrderSpecification.hasStatus(filter.statuses()),
             OrderSpecification.hasUserId(userId));
     var orders = orderRepository.findAll(specification, pageable);
-    return orders.map(orderMapper::toDto);
+    return orders.map(orderAssembler::assemble);
   }
 
   @Transactional(readOnly = true)
@@ -50,6 +50,6 @@ public class OrderQueryServiceImpl implements OrderQueryService {
   public Page<OrderResponseDto> getByUserId(UUID userId, Pageable pageable) {
     var specification = Specification.allOf(OrderSpecification.hasUserId(userId));
     var orders = orderRepository.findAll(specification, pageable);
-    return orders.map(orderMapper::toDto);
+    return orders.map(orderAssembler::assemble);
   }
 }

@@ -1,9 +1,10 @@
 package com.innowise.orderservice.service.impl;
 
-import com.innowise.orderservice.dto.OrderCreateDto;
-import com.innowise.orderservice.dto.OrderItemDto;
-import com.innowise.orderservice.dto.OrderResponseDto;
-import com.innowise.orderservice.dto.OrderUpdateStatusDto;
+import com.innowise.orderservice.assembler.OrderAssembler;
+import com.innowise.orderservice.dto.order.OrderCreateDto;
+import com.innowise.orderservice.dto.order.OrderResponseDto;
+import com.innowise.orderservice.dto.order.OrderUpdateStatusDto;
+import com.innowise.orderservice.dto.orderitem.OrderItemDto;
 import com.innowise.orderservice.entity.Order;
 import com.innowise.orderservice.entity.OrderItem;
 import com.innowise.orderservice.exception.ResourceNotFoundException;
@@ -11,8 +12,6 @@ import com.innowise.orderservice.mapper.OrderMapper;
 import com.innowise.orderservice.repository.OrderRepository;
 import com.innowise.orderservice.service.ItemQueryService;
 import com.innowise.orderservice.service.OrderCommandService;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +28,7 @@ public class OrderCommandServiceImpl implements OrderCommandService {
   private final OrderRepository orderRepository;
   private final OrderMapper orderMapper;
   private final ItemQueryService itemQueryService;
+  private final OrderAssembler orderAssembler;
 
   @Transactional
   @Override
@@ -53,10 +53,10 @@ public class OrderCommandServiceImpl implements OrderCommandService {
       order.addItem(orderItem);
     }
     order.setTotalPrice(calculate(order.getItems()));
-    return orderMapper.toDto(orderRepository.save(order));
+    return orderAssembler.assemble(orderRepository.save(order));
   }
 
-  private @NotNull @Positive BigDecimal calculate(List<OrderItem> items) {
+  private BigDecimal calculate(List<OrderItem> items) {
     return items.stream()
         .map(i -> i.getPriceAtOrder().multiply(BigDecimal.valueOf(i.getQuantity())))
         .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -67,7 +67,7 @@ public class OrderCommandServiceImpl implements OrderCommandService {
   public OrderResponseDto updateStatus(UUID id, OrderUpdateStatusDto dto) {
     var order = orderRepository.findById(id).orElseThrow(() -> ResourceNotFoundException.order(id));
     orderMapper.updateEntity(dto, order);
-    return orderMapper.toDto(order);
+    return orderAssembler.assemble(orderRepository.save(order));
   }
 
   @Transactional
