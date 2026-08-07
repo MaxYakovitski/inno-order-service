@@ -17,7 +17,6 @@ public class OrderAssembler {
 
   public OrderResponseDto assemble(Order order) {
     var userInfo = userServiceClient.getById(order.getUserId(), CurrentToken.get());
-    orderMapper.toDto(order, userInfo);
     return orderMapper.toDto(order, userInfo);
   }
 }

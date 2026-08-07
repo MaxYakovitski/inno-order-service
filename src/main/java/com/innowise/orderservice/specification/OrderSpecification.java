@@ -16,7 +16,7 @@ public class OrderSpecification {
 
   public static Specification<Order> createdBetween(Instant from, Instant to) {
     if (from == null && to == null) {
-      return null;
+      return Specification.unrestricted();
     }
     return (root, query, cb) -> {
       if (from != null && to != null) {
@@ -31,14 +31,14 @@ public class OrderSpecification {
 
   public static Specification<Order> hasStatus(List<OrderStatus> statuses) {
     if (statuses == null || statuses.isEmpty()) {
-      return null;
+      return Specification.unrestricted();
     }
     return (root, _, _) -> root.get("statuses").in(statuses);
   }
 
   public static Specification<Order> hasUserId(UUID userId) {
     if (userId == null) {
-      return null;
+      return Specification.unrestricted();
     }
     return ((root, _, cb) -> cb.equal(root.get("userId"), userId));
   }

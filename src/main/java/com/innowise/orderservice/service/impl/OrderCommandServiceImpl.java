@@ -49,7 +49,12 @@ public class OrderCommandServiceImpl implements OrderCommandService {
 
     for (Map.Entry<UUID, Integer> entry : qtyByItemId.entrySet()) {
       var item = itemsById.get(entry.getKey());
-      OrderItem orderItem = OrderItem.builder().item(item).quantity(entry.getValue()).build();
+      OrderItem orderItem =
+          OrderItem.builder()
+              .item(item)
+              .quantity(entry.getValue())
+              .priceAtOrder(item.getPrice())
+              .build();
       order.addItem(orderItem);
     }
     order.setTotalPrice(calculate(order.getItems()));
