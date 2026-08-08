@@ -26,6 +26,8 @@ databaseChangeLog:
             columns:
               - column:
                   name: status
+        - sql:
+            sql: CREATE INDEX idx_orders_user_not_deleted ON orders (user_id) WHERE deleted = false;
 
   - changeSet:
       id: 001-orders-total-price-check
