@@ -15,7 +15,7 @@ import org.springframework.http.MediaType;
 
 class ItemCommandControllerIntegrationTest extends AbstractIntegrationTest {
 
-  private static final String BASE_URL = "/api/items";
+  private static final String BASE_URL = "/api/v1/items";
 
   @Autowired private ItemRepository itemRepository;
 

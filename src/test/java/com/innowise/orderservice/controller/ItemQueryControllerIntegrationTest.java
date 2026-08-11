@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class ItemQueryControllerIntegrationTest extends AbstractIntegrationTest {
 
-  private static final String BASE_URL = "/api/items";
+  private static final String BASE_URL = "/api/v1/items";
 
   @Autowired private ItemRepository itemRepository;
 

@@ -13,7 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/items")
+@RequestMapping("/api/v1/items")
 @RequiredArgsConstructor
 public class ItemCommandController {
 

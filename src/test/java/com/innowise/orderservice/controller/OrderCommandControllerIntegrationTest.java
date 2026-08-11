@@ -27,7 +27,7 @@ import org.wiremock.spring.InjectWireMock;
 
 class OrderCommandControllerIntegrationTest extends AbstractIntegrationTest {
 
-  private static final String BASE_URL = "/api/orders";
+  private static final String BASE_URL = "/api/v1/orders";
 
   @Autowired private ItemRepository itemRepository;
   @Autowired private OrderRepository orderRepository;

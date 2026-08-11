@@ -3,6 +3,7 @@ package com.innowise.orderservice.controller;
 import com.innowise.orderservice.dto.order.OrderCreateDto;
 import com.innowise.orderservice.dto.order.OrderResponseDto;
 import com.innowise.orderservice.dto.order.OrderUpdateStatusDto;
+import com.innowise.orderservice.security.CurrentUserId;
 import com.innowise.orderservice.service.OrderCommandService;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -10,12 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
 public class OrderCommandController {
 
@@ -24,9 +23,8 @@ public class OrderCommandController {
   @PostMapping
   @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
   public ResponseEntity<OrderResponseDto> create(
-      @AuthenticationPrincipal Jwt jwt, @Valid @RequestBody OrderCreateDto dto) {
-    var userId = UUID.fromString(jwt.getSubject());
-    var order = orderCommandService.create(userId, dto);
+      @CurrentUserId String userId, @Valid @RequestBody OrderCreateDto dto) {
+    var order = orderCommandService.create(UUID.fromString(userId), dto);
     return ResponseEntity.status(HttpStatus.CREATED).body(order);
   }
 

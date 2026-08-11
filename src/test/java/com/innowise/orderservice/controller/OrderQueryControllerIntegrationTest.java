@@ -26,7 +26,7 @@ import org.wiremock.spring.InjectWireMock;
 
 class OrderQueryControllerIntegrationTest extends AbstractIntegrationTest {
 
-  private static final String BASE_URL = "/api/orders";
+  private static final String BASE_URL = "/api/v1/orders";
 
   @Autowired private ItemRepository itemRepository;
   @Autowired private OrderRepository orderRepository;
@@ -36,11 +36,13 @@ class OrderQueryControllerIntegrationTest extends AbstractIntegrationTest {
 
   private Item item;
   private UUID userId;
+  private UUID otherUserId;
 
   @BeforeEach
   void setUp() {
     item = itemRepository.save(Item.builder().name("Item").price(BigDecimal.valueOf(1.0)).build());
     userId = UUID.randomUUID();
+    otherUserId = UUID.randomUUID();
 
     userServiceMock.stubFor(
         WireMock.get(urlPathMatching("/api/users/.*"))
@@ -81,13 +83,7 @@ class OrderQueryControllerIntegrationTest extends AbstractIntegrationTest {
 
   @Test
   void getById_when_admin_returns_order_of_any_user() throws Exception {
-    var order =
-        orderRepository.save(
-            Order.builder()
-                .userId(userId)
-                .status(OrderStatus.CREATED)
-                .totalPrice(BigDecimal.valueOf(1.0))
-                .build());
+    var order = orderRepository.save(order(userId));
 
     mockMvc
         .perform(get(BASE_URL + "/{id}", order.getId()).with(asAdmin()))
@@ -97,13 +93,7 @@ class OrderQueryControllerIntegrationTest extends AbstractIntegrationTest {
 
   @Test
   void getById_when_not_user_and_not_admin_returns_forbidden() throws Exception {
-    var order =
-        orderRepository.save(
-            Order.builder()
-                .userId(userId)
-                .status(OrderStatus.CREATED)
-                .totalPrice(BigDecimal.valueOf(1.0))
-                .build());
+    var order = orderRepository.save(order(userId));
 
     mockMvc
         .perform(get(BASE_URL + "/{id}", order.getId()).with(asUser(UUID.randomUUID())))
@@ -120,40 +110,19 @@ class OrderQueryControllerIntegrationTest extends AbstractIntegrationTest {
 
   @Test
   void getAll_when_user_returns_only_own_orders() throws Exception {
-    var otherUserId = UUID.randomUUID();
-    orderRepository.save(
-        Order.builder()
-            .userId(userId)
-            .status(OrderStatus.CREATED)
-            .totalPrice(BigDecimal.valueOf(1.0))
-            .build());
-    orderRepository.save(
-        Order.builder()
-            .userId(otherUserId)
-            .status(OrderStatus.CREATED)
-            .totalPrice(BigDecimal.valueOf(1.0))
-            .build());
+    orderRepository.save(order(userId));
+    orderRepository.save(order(otherUserId));
 
     mockMvc
-        .perform(get(BASE_URL).with(asUser(userId)))
+        .perform(get(BASE_URL + "/my").with(asUser(userId)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.content.length()").value(1));
   }
 
   @Test
   void getAll_when_admin_returns_all_orders() throws Exception {
-    orderRepository.save(
-        Order.builder()
-            .userId(userId)
-            .status(OrderStatus.CREATED)
-            .totalPrice(BigDecimal.valueOf(1.0))
-            .build());
-    orderRepository.save(
-        Order.builder()
-            .userId(UUID.randomUUID())
-            .status(OrderStatus.CREATED)
-            .totalPrice(BigDecimal.valueOf(1.0))
-            .build());
+    orderRepository.save(order(userId));
+    orderRepository.save(order(otherUserId));
 
     mockMvc
         .perform(get(BASE_URL).with(asAdmin()))
@@ -162,24 +131,25 @@ class OrderQueryControllerIntegrationTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void getByUserId_when_admin_returns_orders_of_given_user() throws Exception {
-    orderRepository.save(
-        Order.builder()
-            .userId(userId)
-            .status(OrderStatus.CREATED)
-            .totalPrice(BigDecimal.valueOf(1.0))
-            .build());
+  void getAll_when_admin_filters_by_user_returns_orders_of_given_user() throws Exception {
+    orderRepository.save(order(userId));
 
     mockMvc
-        .perform(get(BASE_URL + "/user/{userId}", userId).with(asAdmin()))
+        .perform(get(BASE_URL).param("userId", userId.toString()).with(asAdmin()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.content.length()").value(1));
   }
 
   @Test
-  void getByUserId_when_user_returns_forbidden() throws Exception {
-    mockMvc
-        .perform(get(BASE_URL + "/user/{userId}", userId).with(asUser(userId)))
-        .andExpect(status().isForbidden());
+  void getAll_when_user_returns_forbidden() throws Exception {
+    mockMvc.perform(get(BASE_URL).with(asUser(userId))).andExpect(status().isForbidden());
+  }
+
+  private Order order(UUID ownerId) {
+    return Order.builder()
+        .userId(ownerId)
+        .status(OrderStatus.CREATED)
+        .totalPrice(BigDecimal.ONE)
+        .build();
   }
 }

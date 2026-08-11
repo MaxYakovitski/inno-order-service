@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,23 +31,12 @@ public class OrderQueryServiceImpl implements OrderQueryService {
 
   @Transactional(readOnly = true)
   @Override
-  public Page<OrderResponseDto> getAll(Jwt jwt, OrderFilter filter, Pageable pageable) {
-    var isAdmin = "ADMIN".equals(jwt.getClaimAsString("role"));
-    var userId = isAdmin ? null : UUID.fromString(jwt.getSubject());
-
+  public Page<OrderResponseDto> getAll(OrderFilter filter, Pageable pageable) {
     var specification =
         Specification.allOf(
             OrderSpecification.createdBetween(filter.from(), filter.to()),
             OrderSpecification.hasStatus(filter.statuses()),
-            OrderSpecification.hasUserId(userId));
-    var orders = orderRepository.findAll(specification, pageable);
-    return orders.map(orderAssembler::assemble);
-  }
-
-  @Transactional(readOnly = true)
-  @Override
-  public Page<OrderResponseDto> getByUserId(UUID userId, Pageable pageable) {
-    var specification = Specification.allOf(OrderSpecification.hasUserId(userId));
+            OrderSpecification.hasUserId(filter.userId()));
     var orders = orderRepository.findAll(specification, pageable);
     return orders.map(orderAssembler::assemble);
   }

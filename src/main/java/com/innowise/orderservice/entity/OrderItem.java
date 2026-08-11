@@ -5,11 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 @Entity
@@ -17,7 +13,7 @@ import org.hibernate.annotations.UuidGenerator;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
+@Builder
 @Table(name = "order_items")
 public class OrderItem extends AbstractAuditingEntity {
 
@@ -31,6 +27,7 @@ public class OrderItem extends AbstractAuditingEntity {
   @JoinColumn(name = "item_id", nullable = false)
   private Item item;
 
+  @Positive
   @Column(nullable = false)
   private int quantity;
 

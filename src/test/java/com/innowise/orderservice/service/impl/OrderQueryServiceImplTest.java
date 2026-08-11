@@ -25,7 +25,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.oauth2.jwt.Jwt;
 
 @ExtendWith(MockitoExtension.class)
 class OrderQueryServiceImplTest {
@@ -57,35 +56,30 @@ class OrderQueryServiceImplTest {
   }
 
   @Test
-  void getAll_should_return_page() {
+  void getAll_should_return_page_tu_user() {
     UUID userId = UUID.randomUUID();
-    Jwt jwt =
-        Jwt.withTokenValue("token")
-            .header("alg", "none")
-            .claim("sub", userId.toString())
-            .claim("role", "USER")
-            .build();
-    OrderFilter filter = new OrderFilter(null, null, null);
+    OrderFilter filter = new OrderFilter(null, null, null, userId);
     Pageable pageable = PageRequest.of(0, 50);
     Order order = Order.builder().id(UUID.randomUUID()).userId(userId).build();
     Page<Order> page = new PageImpl<>(List.of(order));
     when(orderRepository.findAll(ArgumentMatchers.<Specification<Order>>any(), eq(pageable)))
         .thenReturn(page);
     when(orderAssembler.assemble(order)).thenReturn(sampleResponse(order.getId()));
-    Page<OrderResponseDto> result = orderQueryService.getAll(jwt, filter, pageable);
+    Page<OrderResponseDto> result = orderQueryService.getAll(filter, pageable);
     assertThat(result.getContent()).hasSize(1);
   }
 
   @Test
-  void getByUserId_should_return_page() {
+  void getAll_should_return_page_without_user() {
     UUID userId = UUID.randomUUID();
+    OrderFilter filter = new OrderFilter(null, null, null, null);
     Pageable pageable = PageRequest.of(0, 50);
     Order order = Order.builder().id(UUID.randomUUID()).userId(userId).build();
     Page<Order> page = new PageImpl<>(List.of(order));
     when(orderRepository.findAll(ArgumentMatchers.<Specification<Order>>any(), eq(pageable)))
         .thenReturn(page);
     when(orderAssembler.assemble(order)).thenReturn(sampleResponse(order.getId()));
-    Page<OrderResponseDto> result = orderQueryService.getByUserId(userId, pageable);
+    Page<OrderResponseDto> result = orderQueryService.getAll(filter, pageable);
     assertThat(result.getContent()).hasSize(1);
   }
 
