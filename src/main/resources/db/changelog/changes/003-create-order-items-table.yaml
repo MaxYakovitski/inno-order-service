@@ -1,0 +1,45 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-order-items-table
+      author: ma_yak
+      changes:
+        - createTable:
+            tableName: order_items
+            columns:
+              - column: { name: version, type: BIGINT, constraints: { nullable: false } }
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: order_id, type: UUID,
+                          constraints: { foreignKeyName: fk_order_items_orders,
+                                         references: orders(id),
+                                         nullable: false,
+                                         deleteCascade: true }
+              }
+              - column: { name: item_id, type: UUID,
+                          constraints: { foreignKeyName: fk_order_items_items,
+                                         references: items(id),
+                                         nullable: false }
+              }
+              - column: { name: quantity, type: INT, constraints: { nullable: false } }
+              - column: { name: price_at_order, type: "NUMERIC(12,2)", constraints: {nullable: false } }
+              - column: { name: created_at, type: TIMESTAMPTZ, constraints: { nullable: false } }
+              - column: { name: updated_at, type: TIMESTAMPTZ, constraints: { nullable: false } }
+        - addUniqueConstraint:
+            tableName: order_items
+            columnNames: order_id, item_id
+            constraintName: uq_order_items_order_item
+        - createIndex:
+            tableName: order_items
+            indexName: idx_order_items_item_id
+            columns:
+              - column:
+                  name: item_id
+
+  - changeSet:
+      id: 003-order-items-quantity-check
+      author: ma_yak
+      changes:
+        - sql:
+            sql: ALTER TABLE order_items ADD CONSTRAINT ck_order_items_qty CHECK (quantity > 0)
+      rollback:
+        - sql:
+            sql: ALTER TABLE order_items DROP CONSTRAINT ck_order_items_qty
