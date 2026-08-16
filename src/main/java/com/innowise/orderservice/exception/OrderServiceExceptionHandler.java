@@ -25,7 +25,8 @@ public class OrderServiceExceptionHandler {
 
   @ExceptionHandler(NoResourceFoundException.class)
   public ProblemDetail handleNoResource(NoResourceFoundException e) {
-    ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "Resource not found");
+    ProblemDetail problem =
+        ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "Resource not found");
     problem.setProperty("code", "not_found");
     return problem;
   }
