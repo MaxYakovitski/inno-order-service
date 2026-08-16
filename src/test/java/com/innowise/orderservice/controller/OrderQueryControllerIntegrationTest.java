@@ -45,7 +45,7 @@ class OrderQueryControllerIntegrationTest extends AbstractIntegrationTest {
     otherUserId = UUID.randomUUID();
 
     userServiceMock.stubFor(
-        WireMock.get(urlPathMatching("/api/users/.*"))
+        WireMock.get(urlPathMatching("/api/v1/users/.*"))
             .willReturn(
                 okJson(
                     """
@@ -78,7 +78,7 @@ class OrderQueryControllerIntegrationTest extends AbstractIntegrationTest {
         .perform(get(BASE_URL + "/{id}", orderId).with(asUser(userId)))
         .andExpect(status().isOk());
 
-    userServiceMock.verify(1, getRequestedFor(urlPathMatching("/api/users/" + userId)));
+    userServiceMock.verify(1, getRequestedFor(urlPathMatching("/api/v1/users/" + userId)));
   }
 
   @Test

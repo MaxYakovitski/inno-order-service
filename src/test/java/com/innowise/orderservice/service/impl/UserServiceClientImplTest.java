@@ -30,7 +30,7 @@ class UserServiceClientImplTest {
     var expected = new UserInfoDto(userId, "Maxim", "Maximov", "m@test.com");
 
     doReturn(requestHeadersUriSpec).when(restClient).get();
-    doReturn(requestHeadersSpec).when(requestHeadersUriSpec).uri("/api/users/{id}", userId);
+    doReturn(requestHeadersSpec).when(requestHeadersUriSpec).uri("/api/v1/users/{id}", userId);
     doReturn(requestHeadersSpec)
         .when(requestHeadersSpec)
         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token);

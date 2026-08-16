@@ -20,7 +20,7 @@ public class UserServiceClientImpl implements UserServiceClient {
   public UserInfoDto getById(UUID userId, String token) {
     return restClient
         .get()
-        .uri("/api/users/{id}", userId)
+        .uri("/api/v1/users/{id}", userId)
         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
         .retrieve()
         .body(UserInfoDto.class);

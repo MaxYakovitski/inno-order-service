@@ -1,19 +1,24 @@
 services:
   order-service:
     build: .
+    image: inno-order-service
     container_name: order-service-app
     ports:
-      - "${APP_PORT}:8082"
+      - "${APP_PORT}:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8080
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      USER_SERVICE_URL: ${USER_SERVICE_URL}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://order-postgres:5432/${POSTGRES_DB}
+      SPRING_DATA_REDIS_HOST: order-redis
+      SPRING_DATA_REDIS_PORT: 6379
+      AUTH_JWKS_URI: http://auth-service:8080/.well-known/jwks.json
+      USER_SERVICE_URL: http://user-service:8080
     depends_on:
       order-postgres:
         condition: service_healthy
-      redis:
+      order-redis:
         condition: service_healthy
     networks:
       - inno-net
@@ -27,7 +32,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "${POSTGRES_HOST_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -38,11 +43,11 @@ services:
     networks:
       - order-internal
 
-  redis:
+  order-redis:
     image: redis:7
     container_name: order-service-redis
     ports:
-      - "${REDIS_PORT}:6379"
+      - "${REDIS_HOST_PORT}:6379"
     volumes:
       - redis_data:/data
     healthcheck:

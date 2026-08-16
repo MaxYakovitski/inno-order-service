@@ -9,6 +9,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 @Slf4j
@@ -18,6 +19,13 @@ public class OrderServiceExceptionHandler {
   public ProblemDetail handleResourceNotFoundException(ResourceNotFoundException e) {
     log.warn("Resource not found: {}", e.getMessage());
     ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
+    problem.setProperty("code", "not_found");
+    return problem;
+  }
+
+  @ExceptionHandler(NoResourceFoundException.class)
+  public ProblemDetail handleNoResource(NoResourceFoundException e) {
+    ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "Resource not found");
     problem.setProperty("code", "not_found");
     return problem;
   }
@@ -58,7 +66,7 @@ public class OrderServiceExceptionHandler {
     ProblemDetail problem =
         ProblemDetail.forStatusAndDetail(
             HttpStatus.CONFLICT,
-            "Item cannot be deleted because is referenced by a existing order");
+            "Item cannot be deleted because is referenced by an existing order");
     problem.setProperty("code", "conflict");
     return problem;
   }
@@ -67,7 +75,7 @@ public class OrderServiceExceptionHandler {
   public ProblemDetail handleUnexpected(Exception e) {
     log.error("unexpected error", e);
     ProblemDetail problem =
-        ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Internal error");
     problem.setProperty("code", "internal_error");
     return problem;
   }
