@@ -44,7 +44,7 @@ class OrderCommandControllerIntegrationTest extends AbstractIntegrationTest {
     userId = UUID.randomUUID();
 
     userServiceMock.stubFor(
-        WireMock.get(urlPathMatching("/api/users/" + userId))
+        WireMock.get(urlPathMatching("/api/v1/users/" + userId))
             .willReturn(
                 okJson(
                     """

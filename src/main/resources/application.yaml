@@ -1,28 +1,34 @@
 spring:
+
   application:
-    name: order-service
+    name: inno-order-service
 
   config:
     import: optional:file:.env[.properties]
 
   datasource:
     url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
 
   jpa:
     hibernate:
       ddl-auto: validate
 
+  data:
+    redis:
+      host: localhost
+      port: 6381
+
   security:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: ${AUTH_JWKS_URI:http://localhost:9000/.well-known/jwks.json}
+          jwk-set-uri: ${AUTH_JWKS_URI:http://localhost:8082/.well-known/jwks.json}
 
 user-service:
-  base-url: ${USER_SERVICE_URL:http://localhost:8080}
+  base-url: ${USER_SERVICE_URL:http://localhost:8081}
   timeout-ms: 5000
 
 server:
-  port: ${SERVER_PORT:8082}
+  port: ${SERVER_PORT:8083}
