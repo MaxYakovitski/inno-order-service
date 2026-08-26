@@ -7,6 +7,7 @@ import com.innowise.orderservice.dto.order.OrderUpdateStatusDto;
 import com.innowise.orderservice.dto.orderitem.OrderItemDto;
 import com.innowise.orderservice.entity.Order;
 import com.innowise.orderservice.entity.OrderItem;
+import com.innowise.orderservice.entity.OrderStatus;
 import com.innowise.orderservice.exception.ResourceNotFoundException;
 import com.innowise.orderservice.mapper.OrderMapper;
 import com.innowise.orderservice.repository.OrderRepository;
@@ -15,20 +16,27 @@ import com.innowise.orderservice.service.OrderCommandService;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderCommandServiceImpl implements OrderCommandService {
 
   private final OrderRepository orderRepository;
   private final OrderMapper orderMapper;
   private final ItemQueryService itemQueryService;
   private final OrderAssembler orderAssembler;
+
+  private static final Set<OrderStatus> TERMINAL_STATUSES =
+      Set.of(
+          OrderStatus.PAID, OrderStatus.PAYMENT_FAILED, OrderStatus.SHIPPED, OrderStatus.CANCELED);
 
   @Transactional
   @Override
@@ -80,5 +88,25 @@ public class OrderCommandServiceImpl implements OrderCommandService {
   public void delete(UUID id) {
     var order = orderRepository.findById(id).orElseThrow(() -> ResourceNotFoundException.order(id));
     orderRepository.delete(order);
+  }
+
+  @Transactional
+  @Override
+  public void applyPaymentResult(UUID orderId, OrderStatus resolvedStatus) {
+    var order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> ResourceNotFoundException.order(orderId));
+
+    if (TERMINAL_STATUSES.contains(order.getStatus())) {
+      log.warn(
+          "Ignoring payment event for order {}: already in terminal status {}",
+          orderId,
+          order.getStatus());
+      return;
+    }
+
+    order.setStatus(resolvedStatus);
+    orderRepository.save(order);
   }
 }
