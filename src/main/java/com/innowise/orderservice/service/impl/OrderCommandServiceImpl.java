@@ -36,7 +36,7 @@ public class OrderCommandServiceImpl implements OrderCommandService {
 
   private static final Set<OrderStatus> TERMINAL_STATUSES =
       Set.of(
-          OrderStatus.PAID, OrderStatus.PAYMENT_FAILED, OrderStatus.SHIPPED, OrderStatus.CANCELED);
+          OrderStatus.PAID, OrderStatus.SHIPPED, OrderStatus.CANCELED);
 
   @Transactional
   @Override
