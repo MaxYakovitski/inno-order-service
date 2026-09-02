@@ -26,6 +26,14 @@ spring:
         jwt:
           jwk-set-uri: ${AUTH_JWKS_URI:http://localhost:8082/.well-known/jwks.json}
 
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+payment:
+  kafka:
+    topic: ${PAYMENT_EVENTS_TOPIC:payment-events}
+    consumer-group-id: ${PAYMENT_EVENTS_GROUP_ID:order-service-payment-events}
+
 user-service:
   base-url: ${USER_SERVICE_URL:http://localhost:8081}
   timeout-ms: 5000
